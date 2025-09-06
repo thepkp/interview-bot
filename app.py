@@ -3,8 +3,8 @@ import openai
 import os
 from dotenv import load_dotenv
 from prompts import get_interview_prompt
-from utils.feedback import evaluate_answer
-from utils.report import generate_report
+#from utils.feedback import evaluate_answer
+#from utils.report import generate_report
 
 # Load environment variables
 load_dotenv()
@@ -39,6 +39,43 @@ if st.sidebar.button("Start Interview"):
 st.title("🧑‍💻 Interview Preparation Bot")
 st.write(f"**Role:** {role} | **Mode:** {mode}")
 
+def evaluate_answer(question, answer, mode):
+    """
+    Uses LLM to evaluate user answer. 
+    Returns (feedback, score).
+    """
+    if not answer.strip():
+        return "No answer provided.", 0
+
+    prompt = f"""
+    You are an interviewer evaluating an answer.
+    Question: {question}
+    Candidate's Answer: {answer}
+    Mode: {mode}
+
+    Give concise feedback (2-3 sentences) and score out of 10.
+    Format: 
+    Feedback: <text>
+    Score: <number>
+    """
+
+    try:
+        response = openai.ChatCompletion.create(
+            model="gpt-3.5-turbo",  # Change to "gpt-4" if available
+            messages=[{"role": "user", "content": prompt}]
+        )
+        text = response["choices"][0]["message"]["content"]
+
+        # Simple parsing (customize if needed)
+        feedback = text.split("Score:")[0].replace("Feedback:", "").strip()
+        try:
+            score = int(text.split("Score:")[-1].strip())
+        except:
+            score = 5
+        return feedback, score
+
+    except Exception as e:
+        return f"Error: {str(e)}", 0
 # --- Interview Flow ---
 if st.session_state.questions:
     step = st.session_state.step
