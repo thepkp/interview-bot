@@ -124,4 +124,3 @@ else:
                 pdf_path = generate_report(st.session_state.questions, st.session_state.answers, st.session_state.feedback)
                 with open(pdf_path, "rb") as pdf_file:
                     st.download_button("📥 Download Report", data=pdf_file, file_name="interview_report.pdf")
-
