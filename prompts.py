@@ -4,9 +4,16 @@ def get_interview_prompt(role, mode, num_qs=3):
     """
     if mode == "Technical":
         sample_qs = [
-            f"What is time complexity of binary search in {role} role?",
+            f"What is the time complexity of binary search in {role} role?",
             f"Explain OOPs concepts with examples relevant to {role}.",
-            f"How would you design a scalable login system?"
+            f"How would you design a scalable login system?",
+            f"What are the differences between REST and GraphQL APIs, and when would you use each in {role}?",
+            f"Explain database normalization and why it’s important.",
+            f"How would you optimize a slow SQL query?",
+            f"Describe how caching improves performance in large-scale systems.",
+            f"What are design patterns? Give an example you might use in {role}.",
+            f"How does garbage collection work in languages like Java/Python?",
+            f"Explain the differences between concurrency and parallelism with an example."
         ]
     else:
         sample_qs = [
