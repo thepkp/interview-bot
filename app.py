@@ -92,13 +92,13 @@ if st.session_state.questions:
             st.session_state.answers.append(user_answer)
             st.session_state.feedback.append({"feedback": feedback, "score": score})
             st.session_state.step += 1
-            st.experimental_rerun()
+            st.rerun()
 
         if col2.button("Skip", key=f"skip_{step}"):
             st.session_state.answers.append("Skipped")
             st.session_state.feedback.append({"feedback": "Skipped", "score": 0})
             st.session_state.step += 1
-            st.experimental_rerun()
+            st.rerun()
 
     else:
         st.success("✅ Interview Complete!")
