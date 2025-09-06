@@ -19,6 +19,13 @@ def get_interview_prompt(role, mode, num_qs=3):
         sample_qs = [
             "Tell me about a time you resolved a conflict in your team.",
             "Describe a challenging project you led and its outcome.",
-            "How do you handle feedback and criticism?"
+            "How do you handle feedback and criticism?",
+            "Give an example of when you had to quickly adapt to change.",
+            "Tell me about a failure and what you learned from it.",
+            "How do you manage deadlines when working under pressure?",
+            "Describe a time when you went above and beyond your responsibilities.",
+            "What motivates you to perform at your best?",
+            "How do you handle disagreements with your manager or mentor?",
+            "Give an example of when you had to work with a difficult teammate."
         ]
     return sample_qs[:num_qs]
