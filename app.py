@@ -4,7 +4,7 @@ import os
 from dotenv import load_dotenv
 from prompts import get_interview_prompt
 #from utils.feedback import evaluate_answer
-#from utils.report import generate_report
+from utils.report import generate_report
 
 # Load environment variables
 load_dotenv()
