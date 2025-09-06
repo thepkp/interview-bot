@@ -60,10 +60,10 @@ def evaluate_answer(question, answer, mode):
     """
 
     try:
-       client = openai.OpenAI()  # Automatically uses OPENAI_API_KEY from environment
-       response = client.chat.completions.create(
-           model="gpt-3.5-turbo",
-           messages=[{"role": "user", "content": prompt}]
+        client = openai.OpenAI()  # Automatically uses OPENAI_API_KEY from environment
+        response = client.chat.completions.create(
+            model="gpt-3.5-turbo",
+            messages=[{"role": "user", "content": prompt}]
         )
         text = response["choices"][0]["message"]["content"]
 
