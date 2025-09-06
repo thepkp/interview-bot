@@ -1,5 +1,5 @@
 import streamlit as st
-import openai
+from openai import OpenAI # <-- 1. IMPORT CHANGE: Import the OpenAI class
 import os
 from dotenv import load_dotenv
 from prompts import get_interview_prompt
@@ -8,7 +8,10 @@ from prompts import get_interview_prompt
 
 # Load environment variables
 load_dotenv()
-openai.api_key = os.getenv("OPENAI_API_KEY")
+
+# --- 2. INITIALIZE CLIENT ---
+# The client automatically finds the OPENAI_API_KEY in your .env file
+client = OpenAI()
 
 st.set_page_config(page_title="Interview Preparation Bot", layout="wide")
 
@@ -57,14 +60,18 @@ def evaluate_answer(question, answer, mode):
     Format: 
     Feedback: <text>
     Score: <number>
-    """
+    
 
     try:
-        response = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo",  # Change to "gpt-4" if available
+        # --- 3. API CALL CHANGE ---
+        # The API call now uses the client instance
+        response = client.chat.completions.create(
+            model="gpt-3.5-turbo", # Change to "gpt-4" if available
             messages=[{"role": "user", "content": prompt}]
         )
-        text = response["choices"][0]["message"]["content"]
+        # --- 4. RESPONSE PARSING CHANGE ---
+        # The response is now an object, not a dictionary
+        text = response.choices[0].message.content
 
         # Simple parsing (customize if needed)
         feedback = text.split("Score:")[0].replace("Feedback:", "").strip()
@@ -76,6 +83,7 @@ def evaluate_answer(question, answer, mode):
 
     except Exception as e:
         return f"Error: {str(e)}", 0
+
 # --- Interview Flow ---
 if st.session_state.questions:
     step = st.session_state.step
@@ -115,3 +123,4 @@ if st.session_state.questions:
             pdf_path = generate_report(st.session_state.questions, st.session_state.answers, st.session_state.feedback)
             with open(pdf_path, "rb") as pdf_file:
                 st.download_button("📥 Download Report", data=pdf_file, file_name="interview_report.pdf")
+
