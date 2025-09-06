@@ -34,7 +34,7 @@ if st.sidebar.button("Start Interview"):
     st.session_state.answers = []
     st.session_state.feedback = []
     st.session_state.step = 0
-    st.experimental_rerun()
+    st.rerun()
 
 st.title("🧑‍💻 Interview Preparation Bot")
 st.write(f"**Role:** {role} | **Mode:** {mode}")
