@@ -6,3 +6,4 @@ fpdf
 python-dotenv
 reportlab
 pandas
+google-generativeai
