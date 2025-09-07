@@ -1,5 +1,6 @@
 import streamlit as st
 import os
+import time
 from dotenv import load_dotenv
 from prompts import get_interview_prompt
 from utils.report import generate_report
@@ -90,6 +91,10 @@ if "step" not in st.session_state:
     st.session_state.step = 0
 if "score" not in st.session_state:
     st.session_state.score = 0
+if "interview_start_time" not in st.session_state:
+    st.session_state.interview_start_time = 0
+if "ranking" not in st.session_state:
+    st.session_state.ranking = None
 
 # =========================
 # Sidebar Settings
@@ -131,6 +136,8 @@ if st.sidebar.button("🚀 Start Interview"):
     st.session_state.feedback = []
     st.session_state.step = 0
     st.session_state.score = 0
+    st.session_state.interview_start_time = time.time()
+    st.session_state.ranking = None
     st.rerun()
 
 # =========================
@@ -162,8 +169,15 @@ else:
 
     # Interview Flow
     if step < total_questions:
+        elapsed_time = time.time() - st.session_state.get('interview_start_time', time.time())
+        
+        header_cols = st.columns([3, 1])
+        with header_cols[0]:
+            st.markdown(f"### Question {step + 1}/{total_questions}")
+        with header_cols[1]:
+            st.info(f"⏳ {int(elapsed_time // 60):02d}:{int(elapsed_time % 60):02d}")
+
         q = st.session_state.questions[step]
-        st.markdown(f"### Question {step + 1}/{total_questions}")
         st.markdown(f"<div class='card'>{q['q']}</div>", unsafe_allow_html=True)
 
         choice = st.radio("Choose your answer:", q.get("options", []), index=None, key=f"mcq_{step}")
@@ -191,9 +205,48 @@ else:
 
     # Summary Report
     else:
+        # --- Calculation Block (run once) ---
+        if st.session_state.ranking is None:
+            end_time = time.time()
+            time_taken = end_time - st.session_state.get('interview_start_time', end_time)
+            st.session_state.time_taken = time_taken
+
+            def calculate_ranking(score, total_questions, time_taken):
+                if total_questions == 0:
+                    return "N/A", "Complete an interview to get a rank."
+
+                accuracy = (score / total_questions) * 100
+                avg_time_per_q = time_taken / total_questions
+
+                if accuracy >= 90 and avg_time_per_q <= 45:
+                    return "🌟 Legend", "Exceptional performance with outstanding speed and accuracy."
+                elif accuracy >= 80 and avg_time_per_q <= 75:
+                    return "🎯 Expert", "Excellent accuracy delivered with impressive efficiency."
+                elif accuracy >= 60:
+                    return "👍 Pro", "Solid performance. Focus on improving speed and edge-case knowledge."
+                elif accuracy >= 40:
+                    return "🧑‍🎓 Practitioner", "Good start! Continue practicing to build confidence and accuracy."
+                else:
+                    return "🌱 Novice", "Keep practicing! Every attempt helps you learn and grow."
+
+            rank, desc = calculate_ranking(st.session_state.score, total_questions, st.session_state.time_taken)
+            st.session_state.ranking = rank
+            st.session_state.ranking_description = desc
+
+
         st.success("✅ Interview Complete!")
         st.subheader("📊 Summary Report")
 
+        # --- Metrics Row ---
+        m1, m2, m3 = st.columns(3)
+        accuracy_percent = (st.session_state.score / total_questions) * 100 if total_questions > 0 else 0
+        m1.metric("Final Score", f"{st.session_state.score}/{total_questions}", f"{accuracy_percent:.2f}%")
+        m2.metric("Total Time", f"{st.session_state.time_taken:.2f}s")
+        m3.metric("Your Rank", st.session_state.ranking)
+        st.markdown(f"> *{st.session_state.ranking_description}*")
+        st.write("---")
+
+        # --- Charts Row ---
         col1, col2 = st.columns(2)
         with col1:
             st.markdown("<h5>Overall Performance</h5>", unsafe_allow_html=True)
@@ -204,10 +257,8 @@ else:
             st.markdown("<h5>Question Breakdown</h5>", unsafe_allow_html=True)
             bar_fig = create_bar_chart(st.session_state.feedback)
             st.plotly_chart(bar_fig, use_container_width=True)
-
-        st.info(f"🎯 Final Score: {st.session_state.score}/{total_questions}")
-        st.write("---")
         
+        st.write("---")
         st.subheader("💡 Detailed Feedback")
         for i, (q, ans, fb) in enumerate(zip(st.session_state.questions, st.session_state.answers, st.session_state.feedback)):
             with st.expander(f"**Q{i+1}: {q['q']}**"):
@@ -215,7 +266,6 @@ else:
                 st.write(f"💬 **Feedback:** {fb}")
 
         # PDF Report Download
-        # FIX: Reverted the arguments to match the expected format of the report generator.
         pdf_path = generate_report(
             [q['q'] for q in st.session_state.questions],
             st.session_state.answers,
