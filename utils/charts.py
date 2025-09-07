@@ -62,41 +62,47 @@ def create_donut_chart(score, total_questions):
 
 def create_bar_chart(feedback):
     """
-    Creates a horizontal bar chart showing the count of correct and incorrect answers.
+    Creates a visually appealing pie chart showing the breakdown of answers.
     """
-    correct_answers = sum(1 for fb in feedback if '✅ Correct' in fb)
-    incorrect_answers = len(feedback) - correct_answers
-    
-    # Define labels and values for the chart
-    labels = ['Incorrect', 'Correct']
-    values = [incorrect_answers, correct_answers]
-    colors = ['#F44336', '#8BC34A'] # Red for incorrect, Green for correct
+    correct = sum(1 for fb in feedback if '✅ Correct' in fb)
+    incorrect = sum(1 for fb in feedback if '❌ Incorrect' in fb)
+    skipped = sum(1 for fb in feedback if 'Skipped' in fb)
 
-    fig = go.Figure()
+    labels = ['Correct', 'Incorrect', 'Skipped']
+    values = [correct, incorrect, skipped]
+    colors = ['#8BC34A', '#F44336', '#607D8B'] # Green, Red, Grey
 
-    fig.add_trace(go.Bar(
-        y=labels,
-        x=values,
-        orientation='h', # Make the bar chart horizontal
+    # Filter out categories with zero values to avoid cluttering the chart
+    final_labels = [label for i, label in enumerate(labels) if values[i] > 0]
+    final_values = [value for value in values if value > 0]
+    final_colors = [color for i, color in enumerate(colors) if values[i] > 0]
+
+    if not final_values: # Handle case where there is no feedback
+        return go.Figure()
+
+    fig = go.Figure(data=[go.Pie(
+        labels=final_labels,
+        values=final_values,
+        hole=.6,
         marker=dict(
-            color=colors,
-            line=dict(color='#1e293b', width=1)
+            colors=final_colors,
+            line=dict(color='#1e293b', width=2)
         ),
-        text=values,
-        textposition='outside', # Show the count outside the bar
-        textfont=dict(color='#f1f5f9', size=16)
-    ))
+        hoverinfo='label+percent+value',
+        textinfo='percent',
+        textfont=dict(size=16, color='white'),
+        pull=[0.05 if v > 0 else 0 for v in final_values] # Slightly pull out slices
+    )])
 
     fig.update_layout(
-        showlegend=False,
+        title=dict(text='Question Breakdown', x=0.5, font=dict(size=20)),
+        showlegend=True,
+        legend=dict(orientation="h", yanchor="bottom", y=-0.2, xanchor="center", x=0.5),
         paper_bgcolor='rgba(0,0,0,0)',
         plot_bgcolor='rgba(0,0,0,0)',
         font_color='#f1f5f9',
-        margin=dict(t=40, b=40, l=20, r=20),
+        margin=dict(t=60, b=60, l=20, r=20),
         height=400,
-        xaxis=dict(showgrid=False, visible=False), # Hide x-axis labels and grid
-        yaxis=dict(showgrid=False, automargin=True), # Hide y-axis grid
-        title=dict(text='Question Breakdown', x=0.5) # Add a title to the chart
     )
     
     return fig
