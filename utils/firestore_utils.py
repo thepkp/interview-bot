@@ -13,13 +13,24 @@ def init_firestore():
         # Check if the app is already initialized
         if not firebase_admin._apps:
             # Get the service account key from Streamlit secrets
-            service_account_key = json.loads(st.secrets["FIREBASE_SERVICE_ACCOUNT"])
+            secret_value = st.secrets["FIREBASE_SERVICE_ACCOUNT"]
+
+            # Check if Streamlit has already parsed the secret as a dictionary
+            if isinstance(secret_value, dict):
+                service_account_key = secret_value
+            # If it's a string, load it as JSON
+            elif isinstance(secret_value, str):
+                service_account_key = json.loads(secret_value)
+            else:
+                raise TypeError("Firebase service account secret is not in a valid format (string or dict).")
+
             cred = credentials.Certificate(service_account_key)
             firebase_admin.initialize_app(cred)
         # Return the Firestore client
         return firestore.client()
     except Exception as e:
-        st.error(f"Failed to initialize Firestore: {e}")
+        # Provide a more helpful error message
+        st.error(f"Failed to initialize Firestore: {e}. Please ensure your FIREBASE_SERVICE_ACCOUNT secret is a valid JSON.")
         return None
 
 def save_score(db, name, email, score, total_questions, role):
@@ -66,3 +77,4 @@ def get_leaderboard(db, role_filter='All'):
         })
         
     return pd.DataFrame(leaderboard_data)
+
