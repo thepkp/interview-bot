@@ -218,16 +218,16 @@ else:
                 accuracy = (score / total_questions) * 100
                 avg_time_per_q = time_taken / total_questions
 
-                if accuracy >= 90 and avg_time_per_q <= 45:
-                    return "🌟 Legend", "Exceptional performance with outstanding speed and accuracy."
-                elif accuracy >= 80 and avg_time_per_q <= 75:
-                    return "🎯 Expert", "Excellent accuracy delivered with impressive efficiency."
+                if accuracy >= 95 and avg_time_per_q < 30:
+                    return "S-Tier (Godlike)", "Flawless accuracy and lightning-fast responses. Truly top-tier performance."
+                elif accuracy >= 80 and avg_time_per_q < 60:
+                    return "A-Tier (Expert)", "High accuracy and great speed. You're well-prepared for technical challenges."
                 elif accuracy >= 60:
-                    return "👍 Pro", "Solid performance. Focus on improving speed and edge-case knowledge."
+                    return "B-Tier (Proficient)", "Good accuracy. Focus on increasing your response speed and deepening your knowledge."
                 elif accuracy >= 40:
-                    return "🧑‍🎓 Practitioner", "Good start! Continue practicing to build confidence and accuracy."
+                    return "C-Tier (Competent)", "You have a foundational understanding. Consistent practice will improve your accuracy."
                 else:
-                    return "🌱 Novice", "Keep practicing! Every attempt helps you learn and grow."
+                    return "D-Tier (Beginner)", "A good first step. Focus on reviewing fundamentals and trying again."
 
             rank, desc = calculate_ranking(st.session_state.score, total_questions, st.session_state.time_taken)
             st.session_state.ranking = rank
@@ -244,7 +244,17 @@ else:
         m2.metric("Total Time", f"{st.session_state.time_taken:.2f}s")
         m3.metric("Your Rank", st.session_state.ranking)
         st.markdown(f"> *{st.session_state.ranking_description}*")
+        
+        with st.expander("How are rankings calculated?"):
+            st.markdown("""
+            - **S-Tier (Godlike):** >95% accuracy & <30s per question.
+            - **A-Tier (Expert):** >80% accuracy & <60s per question.
+            - **B-Tier (Proficient):** >60% accuracy.
+            - **C-Tier (Competent):** >40% accuracy.
+            - **D-Tier (Beginner):** <=40% accuracy.
+            """)
         st.write("---")
+
 
         # --- Charts Row ---
         col1, col2 = st.columns(2)
