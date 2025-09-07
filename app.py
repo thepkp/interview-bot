@@ -4,7 +4,7 @@ import time
 from dotenv import load_dotenv
 from prompts import get_interview_prompt
 from utils.report import generate_report
-from utils.charts import create_donut_chart, create_bar_chart
+from utils.charts import create_donut_chart
 
 # =========================
 # Load environment variables
