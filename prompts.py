@@ -131,22 +131,8 @@ def get_ai_interview_questions(role, mode, num_qs, custom_set):
         return None, error_msg
 
 
-def get_interview_prompt(role, mode, num_qs, custom_set="Standard", use_ai=False):
-    """
-    Main function to get questions. It can use AI or the preset database.
-    Returns a tuple: (questions_list, error_message)
-    """
-    if use_ai:
-        questions, error = get_ai_interview_questions(role, mode, num_qs, custom_set)
-        if questions:
-            return questions, None
-        else:
-            # Fallback to standard questions if AI fails
-            standard_questions, _ = get_interview_prompt(role, mode, num_qs, custom_set, use_ai=False)
-            error_message = f"{error}. Falling back to standard questions."
-            return standard_questions, error_message
-
-    # --- Logic for preset questions ---
+def get_preset_interview_questions(role, mode, num_qs, custom_set):
+    """Helper function to get questions from the hardcoded DB."""
     if custom_set != "Standard":
         selected_questions_pool = questions_db.get("Custom Sets", {}).get(custom_set, [])
     else:
@@ -155,9 +141,28 @@ def get_interview_prompt(role, mode, num_qs, custom_set="Standard", use_ai=False
     if not selected_questions_pool:
         return [{"q": "No questions found for this selection.", "options": [], "answer": ""}], None
 
-    if len(selected_questions_pool) < num_qs:
-        random.shuffle(selected_questions_pool)
-        return selected_questions_pool, None
+    # Ensure we don't request more questions than are available
+    k = min(num_qs, len(selected_questions_pool))
+    
+    return random.sample(selected_questions_pool, k=k), None
 
-    return random.sample(selected_questions_pool, k=num_qs), None
+
+def get_interview_prompt(role, mode, num_qs, custom_set="Standard", use_ai=False):
+    """
+    Main function to get questions. It can use AI or the preset database.
+    Returns a tuple: (questions_list, error_message)
+    """
+    # If the user wants AI OR they've selected FAANG/MAANG, prioritize AI questions.
+    if use_ai or custom_set == "FAANG / MAANG":
+        questions, error = get_ai_interview_questions(role, mode, num_qs, custom_set)
+        if questions:
+            return questions, None
+        else:
+            # Fallback to preset questions if AI fails
+            error_message = f"{error}. Falling back to preset questions."
+            preset_questions, _ = get_preset_interview_questions(role, mode, num_qs, custom_set)
+            return preset_questions, error_message
+
+    # --- Logic for preset questions (Standard set with AI toggled off) ---
+    return get_preset_interview_questions(role, mode, num_qs, custom_set)
 
