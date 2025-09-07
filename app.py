@@ -116,11 +116,13 @@ else:
 num_qs = st.sidebar.slider("Number of Questions", 3, 10, 3)
 
 if st.sidebar.button("🚀 Start Interview"):
-    spinner_text = "🤖 Generating unique questions..." if use_ai else "Preparing your interview..."
+    spinner_text = "🤖 Generating unique questions..." if use_ai or custom_set == "FAANG / MAANG" else "Preparing your interview..."
     with st.spinner(spinner_text):
         questions, error_message = get_interview_prompt(role, mode, num_qs, custom_set, use_ai)
         if error_message:
-            st.error(error_message)
+            st.warning(error_message) # Use a warning for fallback, error for complete failure
+        if not questions:
+            st.error("Could not load any questions. Please try again.")
             st.stop()
         st.session_state.questions = questions
 
@@ -213,11 +215,11 @@ else:
                 st.write(f"💬 **Feedback:** {fb}")
 
         # PDF Report Download
+        # FIX: Reverted the arguments to match the expected format of the report generator.
         pdf_path = generate_report(
             [q['q'] for q in st.session_state.questions],
             st.session_state.answers,
-            st.session_state.feedback,
-            st.session_state.score
+            [{"feedback": fb, "score": (1 if '✅ Correct' in fb else 0)} for fb in st.session_state.feedback]
         )
         with open(pdf_path, "rb") as pdf_file:
             st.download_button(
