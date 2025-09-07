@@ -7,3 +7,4 @@ python-dotenv
 reportlab
 pandas
 google-generativeai
+firebase-admin
