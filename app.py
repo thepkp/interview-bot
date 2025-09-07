@@ -3,6 +3,7 @@ import os
 from dotenv import load_dotenv
 from prompts import get_interview_prompt
 from utils.report import generate_report
+from utils.charts import create_donut_chart, create_bar_chart
 
 # =========================
 # Load environment variables
@@ -153,23 +154,39 @@ else:
             st.rerun()
 
     else:
-        # Summary Report
-        st.success("✅ Interview Complete!")
-        st.subheader("📊 Summary Report")
-
-        for i, (q, ans, fb) in enumerate(zip(st.session_state.questions, st.session_state.answers, st.session_state.feedback)):
-            st.markdown(f"**Q{i+1}: {q['q']}**")
-            st.write(f"📝 Your Answer: {ans}")
-            st.write(f"💡 Feedback: {fb}")
+          # === Summary Report ==
+          # === Summary Report ===
+            st.success("✅ Interview Complete!")
+            st.subheader("📊 Summary Report")
+            
+            # --- Visualizations ---
+            col1, col2 = st.columns(2)
+            with col1:
+                st.markdown("<h5>Overall Performance</h5>", unsafe_allow_html=True)
+                donut_fig = create_donut_chart(st.session_state.score, len(st.session_state.questions))
+                st.plotly_chart(donut_fig, use_container_width=True)
+            
+            with col2:
+                st.markdown("<h5>Question Breakdown</h5>", unsafe_allow_html=True)
+                bar_fig = create_bar_chart(st.session_state.feedback)
+                st.plotly_chart(bar_fig, use_container_width=True)
+            
+            st.info(f"🎯 Final Score: {st.session_state.score}/{len(st.session_state.questions)}")
             st.write("---")
-
-        st.info(f"🎯 Final Score: {st.session_state.score}/{len(st.session_state.questions)}")
-
-        if st.button("Download PDF Report"):
-            pdf_path = generate_report(
-                [q['q'] for q in st.session_state.questions],
-                st.session_state.answers,
-                [{"feedback": fb, "score": (1 if 'Correct' in fb else 0)} for fb in st.session_state.feedback]
-            )
-            with open(pdf_path, "rb") as pdf_file:
-                st.download_button("📥 Download Report", data=pdf_file, file_name="interview_report.pdf")
+            
+            # --- Detailed Feedback ---
+            st.subheader("💡 Detailed Feedback")
+            for i, (q, ans, fb) in enumerate(zip(st.session_state.questions, st.session_state.answers, st.session_state.feedback)):
+                with st.expander(f"**Q{i+1}: {q['q']}**"):
+                    st.write(f"📝 **Your Answer:** {ans}")
+                    st.write(f"💬 **Feedback:** {fb}")
+            
+            
+            if st.button("Download PDF Report"):
+                pdf_path = generate_report(
+                    [q['q'] for q in st.session_state.questions],
+                    st.session_state.answers,
+                    [{"feedback": fb, "score": (1 if 'Correct' in fb else 0)} for fb in st.session_state.feedback]
+                )
+                with open(pdf_path, "rb") as pdf_file:
+                    st.download_button("📥 Download Report", data=pdf_file, file_name="interview_report.pdf")
