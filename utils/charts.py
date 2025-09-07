@@ -62,48 +62,58 @@ def create_donut_chart(score, total_questions):
 
 def create_bar_chart(feedback):
     """
-    Creates a visually appealing pie chart showing the breakdown of answers.
+    Creates a bar chart showing the performance for each question.
     """
-    correct = sum(1 for fb in feedback if '✅ Correct' in fb)
-    incorrect = sum(1 for fb in feedback if '❌ Incorrect' in fb)
-    skipped = sum(1 for fb in feedback if 'Skipped' in fb)
+    total_questions = len(feedback)
+    correct_answers = sum(1 for fb in feedback if 'Correct' in fb)
+    incorrect_answers = total_questions - correct_answers
 
-    labels = ['Correct', 'Incorrect', 'Skipped']
-    values = [correct, incorrect, skipped]
-    colors = ['#8BC34A', '#F44336', '#607D8B'] # Green, Red, Grey
+    # Percentages are now only for the text display, not the chart values
+    if total_questions == 0:
+        correct_perc = 0
+        incorrect_perc = 0
+    else:
+        correct_perc = round((correct_answers / total_questions) * 100)
+        incorrect_perc = 100 - correct_perc
 
-    # Filter out categories with zero values to avoid cluttering the chart
-    final_labels = [label for i, label in enumerate(labels) if values[i] > 0]
-    final_values = [value for value in values if value > 0]
-    final_colors = [color for i, color in enumerate(colors) if values[i] > 0]
+    fig = make_subplots(rows=2, cols=1, specs=[[{'type':'domain'}], [{'type':'domain'}]])
 
-    if not final_values: # Handle case where there is no feedback
-        return go.Figure()
+    # Chart 1: Correct Answers
+    fig.add_trace(go.Pie(
+        # FIX: Use the raw counts. Plotly will calculate percentages automatically.
+        values=[correct_answers, incorrect_answers],
+        labels=['Correct', 'Incorrect'],
+        hole=.8,
+        marker=dict(colors=['#8BC34A', '#37474F']),
+        textinfo='none',
+        hoverinfo='none',
+        sort=False
+    ), 1, 1)
 
-    fig = go.Figure(data=[go.Pie(
-        labels=final_labels,
-        values=final_values,
-        hole=.6,
-        marker=dict(
-            colors=final_colors,
-            line=dict(color='#1e293b', width=2)
-        ),
-        hoverinfo='label+percent+value',
-        textinfo='percent',
-        textfont=dict(size=16, color='white'),
-        pull=[0.05 if v > 0 else 0 for v in final_values] # Slightly pull out slices
-    )])
+    # Chart 2: Incorrect Answers
+    fig.add_trace(go.Pie(
+        # FIX: Use the raw counts, with 'incorrect' as the primary value.
+        values=[incorrect_answers, correct_answers],
+        labels=['Incorrect', 'Correct'],
+        hole=.8,
+        marker=dict(colors=['#F44336', '#37474F']),
+        textinfo='none',
+        hoverinfo='none',
+        sort=False
+    ), 2, 1)
 
     fig.update_layout(
-        title=dict(text='Question Breakdown', x=0.5, font=dict(size=20)),
-        showlegend=True,
-        legend=dict(orientation="h", yanchor="bottom", y=-0.2, xanchor="center", x=0.5),
+        showlegend=False,
         paper_bgcolor='rgba(0,0,0,0)',
         plot_bgcolor='rgba(0,0,0,0)',
-        font_color='#f1f5f9',
-        margin=dict(t=60, b=60, l=20, r=20),
         height=400,
+        margin=dict(t=40, b=40, l=10, r=10),
+        annotations=[
+            # Annotations use the calculated percentages for display
+            dict(text=f'{correct_perc}%', x=0.5, y=0.8, font=dict(size=30, color='#f1f5f9'), showarrow=False),
+            dict(text='Correct', x=0.5, y=0.7, font=dict(size=14, color='#94a3b8'), showarrow=False),
+            dict(text=f'{incorrect_perc}%', x=0.5, y=0.3, font=dict(size=30, color='#f1f5f9'), showarrow=False),
+            dict(text='Incorrect', x=0.5, y=0.2, font=dict(size=14, color='#94a3b8'), showarrow=False),
+        ]
     )
-    
     return fig
-
