@@ -43,7 +43,7 @@ def create_donut_chart(score, total_questions):
         direction='clockwise',
         sort=False,
         # Animation on hover - pop out effect
-        pull=[0.0, 0.0, 0.0] # Initial pull is 0, will change on hover
+        pull=[0.2, 0.2, 0.0] # Initial pull is 0, will change on hover
     )])
 
     fig.update_layout(
@@ -58,17 +58,6 @@ def create_donut_chart(score, total_questions):
                  font=dict(size=40, color="#f1f5f9", family="Arial, sans-serif"),
                  showarrow=False)
         ],
-        # Add shadow effect (this will be more visible in a web context with CSS)
-        # For direct plotly output, we can simulate by making the background slightly darker
-        # or rely on embedding and CSS.
-    )
-
-    # To achieve a shadow effect directly within Plotly's standalone output for a donut chart,
-    # we can try to layer shapes or use a background image for a very sophisticated shadow.
-    # A simpler approach, which is often used and more effective in a full web application,
-    # is to apply a CSS box-shadow to the div containing the Plotly chart.
-    # For this Python-only code, the "shadow" will be subtle.
-
     return fig
 
 
