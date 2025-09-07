@@ -56,6 +56,18 @@ questions_db = {
         ]
     },
     "Product Manager": {
+        "Technical": [
+            {"q": "What is an API and how does it differ from an SDK?", "options": ["They are the same", "API is a set of rules, SDK is a set of tools", "API is for frontend, SDK is for backend", "SDK is a type of API"], "answer": "API is a set of rules, SDK is a set of tools"},
+            {"q": "Explain the difference between front-end and back-end development.", "options": ["Front-end is what the user sees, back-end is the server logic", "Front-end uses HTML, back-end uses CSS", "There is no difference", "Front-end is harder than back-end"], "answer": "Front-end is what the user sees, back-end is the server logic"},
+            {"q": "What is a 'tech stack'?", "options": ["A pile of old computers", "A list of required bug fixes", "The set of technologies used to build an application", "A software design pattern"], "answer": "The set of technologies used to build an application"},
+            {"q": "What does it mean for a system to be 'scalable'?", "options": ["It is easy to use", "It has no bugs", "It can handle a growing amount of work or users", "It is written in a popular language"], "answer": "It can handle a growing amount of work or users"},
+            {"q": "What is the purpose of a wireframe vs. a mockup vs. a prototype?", "options": ["They all mean the same thing", "Wireframe is structure, Mockup is visual, Prototype is interactive", "A prototype is a final product", "Wireframes are only for mobile apps"], "answer": "Wireframe is structure, Mockup is visual, Prototype is interactive"},
+            {"q": "Explain what a SQL JOIN is used for.", "options": ["To delete a table", "To combine rows from two or more tables based on a related column", "To create a new database", "To add a new column to a table"], "answer": "To combine rows from two or more tables based on a related column"},
+            {"q": "How would you explain 'technical debt' to a non-technical stakeholder?", "options": ["It's a security bug", "It's the cost of a software license", "It is the implied cost of rework caused by choosing an easy solution now instead of a better approach", "It's money the company owes to its developers"], "answer": "It is the implied cost of rework caused by choosing an easy solution now instead of a better approach"},
+            {"q": "What are some key metrics you would track for a mobile app's technical performance?", "options": ["Number of downloads", "Daily active users", "Crash rate and API latency", "App store rating"], "answer": "Crash rate and API latency"},
+            {"q": "What is the difference between Agile and Waterfall development methodologies?", "options": ["Agile is iterative, Waterfall is sequential", "Waterfall is a newer methodology", "There is no difference", "Agile is only for small teams"], "answer": "Agile is iterative, Waterfall is sequential"},
+            {"q": "What is the role of a database in a modern web application?", "options": ["To style the webpage", "To store, retrieve, and manage user and application data", "To run the web server", "To handle user authentication only"], "answer": "To store, retrieve, and manage user and application data"}
+        ],
         "Behavioral": [
             {"q": "How would you prioritize features for a new product?", "options": ["Based on what the CEO likes", "Using a framework like RICE or MoSCoW", "Building the easiest features first", "Based on what competitors have"], "answer": "Using a framework like RICE or MoSCoW"},
             {"q": "How do you measure the success of a product?", "options": ["By the number of features it has", "By how much the development team likes it", "By defining and tracking key metrics (KPIs) like user engagement and revenue", "By the absence of bugs"], "answer": "By defining and tracking key metrics (KPIs) like user engagement and revenue"},
@@ -69,8 +81,8 @@ questions_db = {
             {"q": "How do you conduct user research?", "options": ["By assuming I am the user", "Through a mix of surveys, interviews, and usability testing", "By asking my friends what they think", "I don't, I just build what I think is right"], "answer": "Through a mix of surveys, interviews, and usability testing"}
         ]
     },
-     "Data Analyst": {
-         "Technical": [
+    "Data Analyst": {
+        "Technical": [
             {"q": "What is the difference between SQL and NoSQL databases?", "options": ["SQL is for structured data, NoSQL is for unstructured data", "NoSQL is older than SQL", "SQL is only used for web apps", "There is no difference"], "answer": "SQL is for structured data, NoSQL is for unstructured data"},
             {"q": "What is the difference between `JOIN` and `UNION` in SQL?", "options": ["`JOIN` combines columns from different tables, `UNION` combines rows", "`UNION` combines columns, `JOIN` combines rows", "They are identical operations", "`JOIN` is faster than `UNION`"], "answer": "`JOIN` combines columns from different tables, `UNION` combines rows"},
             {"q": "Explain the ETL (Extract, Transform, Load) process.", "options": ["A type of database query", "A process to move data from a source to a data warehouse", "A data visualization technique", "A statistical modeling method"], "answer": "A process to move data from a source to a data warehouse"},
@@ -81,8 +93,20 @@ questions_db = {
             {"q": "Explain the concept of A/B testing.", "options": ["A test with only two questions", "A method of comparing two versions of a webpage or app against each other to determine which one performs better", "A type of database backup", "Testing the API and the Backend"], "answer": "A method of comparing two versions of a webpage or app against each other to determine which one performs better"},
             {"q": "What is the difference between supervised and unsupervised machine learning?", "options": ["Supervised learning uses labeled data, unsupervised learning uses unlabeled data", "Unsupervised learning is always more accurate", "Supervised learning requires a human to watch the computer", "There is no difference"], "answer": "Supervised learning uses labeled data, unsupervised learning uses unlabeled data"},
             {"q": "What is a data warehouse?", "options": ["A physical building where servers are stored", "A large, centralized repository of data that is used for reporting and analysis", "A small, temporary database", "The same as a standard transactional database"], "answer": "A large, centralized repository of data that is used for reporting and analysis"}
-         ]
-     }
+        ],
+        "Behavioral": [
+            {"q": "Describe a time you found an unexpected insight in a dataset. What was the impact?", "options": ["I ignored it to finish my work faster", "I investigated it further and presented the finding, which led to a new business strategy", "I assumed it was an error in the data", "I kept the finding to myself"], "answer": "I investigated it further and presented the finding, which led to a new business strategy"},
+            {"q": "How do you ensure the quality and accuracy of your data analysis?", "options": ["I just assume the data is correct", "By performing data validation, checking for outliers, and cross-referencing with other sources", "I ask a colleague to check my work without explaining my methods", "I rush through the analysis to meet deadlines"], "answer": "By performing data validation, checking for outliers, and cross-referencing with other sources"},
+            {"q": "Describe a project where you had to work with incomplete or messy data. What steps did you take?", "options": ["I refused to work with the data", "I deleted the rows with missing values", "I used techniques like imputation for missing values and documented my cleaning process", "I presented the messy data as it was"], "answer": "I used techniques like imputation for missing values and documented my cleaning process"},
+            {"q": "How do you prioritize your tasks when you have multiple data requests with tight deadlines?", "options": ["I work on the easiest request first", "I work on them in the order they were received", "I assess the impact and urgency of each request and communicate my timeline to stakeholders", "I complain about the workload"], "answer": "I assess the impact and urgency of each request and communicate my timeline to stakeholders"},
+            {"q": "Tell me about a time you made a mistake in your analysis. How did you handle it?", "options": ["I hoped nobody would notice", "I immediately informed the stakeholders, corrected the mistake, and explained the impact", "I blamed the data source", "I deleted the analysis and started over without telling anyone"], "answer": "I immediately informed the stakeholders, corrected the mistake, and explained the impact"},
+            {"q": "How do you stay updated with the latest trends and tools in data analytics?", "options": ["I rely only on the tools my company provides", "By following industry blogs, participating in webinars, and experimenting with new tools", "I think learning new tools is a waste of time", "I wait to be told what to learn"], "answer": "By following industry blogs, participating in webinars, and experimenting with new tools"},
+            {"q": "Describe a situation where your data analysis challenged a long-held belief within the company.", "options": ["I changed my analysis to match the belief", "I presented my findings with clear data and visualizations, and explained my methodology", "I didn't share the findings to avoid conflict", "I announced the finding in a large meeting without preparing stakeholders"], "answer": "I presented my findings with clear data and visualizations, and explained my methodology"},
+            {"q": "How would you handle a disagreement with a stakeholder about the interpretation of your data?", "options": ["I would agree with their interpretation to avoid an argument", "I would listen to their perspective and walk them through the data and my analysis to find common ground", "I would insist that my interpretation is the only correct one", "I would escalate the issue to their manager"], "answer": "I would listen to their perspective and walk them through the data and my analysis to find common ground"},
+            {"q": "What is your process for starting a new data analysis project?", "options": ["I start creating charts immediately", "I first seek to understand the business problem and the key questions that need to be answered", "I gather as much data as possible without a clear goal", "I wait for detailed instructions on every step"], "answer": "I first seek to understand the business problem and the key questions that need to be answered"},
+            {"q": "Can you give an example of how you've used data to tell a compelling story?", "options": ["I just present a table of numbers", "I use visualizations and a clear narrative to explain what the data means and why it's important", "I don't believe in storytelling with data", "I make the story overly complicated with jargon"], "answer": "I use visualizations and a clear narrative to explain what the data means and why it's important"}
+        ]
+    }
 }
 
 
@@ -115,7 +139,7 @@ def get_ai_interview_questions(role, mode, num_qs, custom_set):
         generated_questions = json.loads(json_text)
         
         if not isinstance(generated_questions, list):
-             raise ValueError("AI did not return a list of questions as expected.")
+                raise ValueError("AI did not return a list of questions as expected.")
 
         return generated_questions, None
     except (json.JSONDecodeError, ValueError) as e:
@@ -152,8 +176,8 @@ def get_interview_prompt(role, mode, num_qs, custom_set="Standard", use_ai=False
     Main function to get questions. It can use AI or the preset database.
     Returns a tuple: (questions_list, error_message)
     """
-    # If the user wants AI OR they've selected FAANG/MAANG, prioritize AI questions.
-    if use_ai or custom_set == "FAANG / MAANG":
+    # If the user wants AI, use it.
+    if use_ai:
         questions, error = get_ai_interview_questions(role, mode, num_qs, custom_set)
         if questions:
             return questions, None
@@ -163,6 +187,6 @@ def get_interview_prompt(role, mode, num_qs, custom_set="Standard", use_ai=False
             preset_questions, _ = get_preset_interview_questions(role, mode, num_qs, custom_set)
             return preset_questions, error_message
 
-    # --- Logic for preset questions (Standard set with AI toggled off) ---
+    # --- Logic for preset questions (AI toggled off) ---
     return get_preset_interview_questions(role, mode, num_qs, custom_set)
 
