@@ -96,14 +96,14 @@ if "score" not in st.session_state:
 # =========================
 st.sidebar.title("⚙️ Setup Interview")
 
-# --- NEW: Add a select box for custom question sets ---
+# --- UPDATED: Changed the selectbox options ---
 custom_set = st.sidebar.selectbox(
     "Custom Question Set",
-    ["None (select role below)", "FAANG / MAANG"]
+    ["Standard", "FAANG / MAANG"]
 )
 
-# --- Make role/mode selectors dependent on custom set selection ---
-if custom_set == "None (select role below)":
+# --- UPDATED: Changed the condition to check for "Standard" ---
+if custom_set == "Standard":
     role = st.sidebar.selectbox("Role", ["Software Engineer", "Product Manager", "Data Analyst"])
     mode = st.sidebar.radio("Mode", ["Technical", "Behavioral"])
 else:
@@ -117,7 +117,7 @@ else:
 num_qs = st.sidebar.slider("Number of Questions", 3, 10, 3)
 
 if st.sidebar.button("🚀 Start Interview"):
-    # --- UPDATED: Pass the custom_set to the prompt generator ---
+    # Pass the custom_set to the prompt generator
     st.session_state.questions = get_interview_prompt(role, mode, num_qs, custom_set)
     st.session_state.answers = []
     st.session_state.feedback = []
