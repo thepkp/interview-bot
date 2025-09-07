@@ -14,7 +14,7 @@ def create_donut_chart(score, total_questions):
     fig = go.Figure(data=[go.Pie(
         labels=labels,
         values=values,
-        hole=.4,
+        hole=.55,
         marker_colors=colors,
         hoverinfo='label+percent',
         textinfo='value',
