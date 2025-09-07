@@ -106,11 +106,11 @@ def create_bar_chart(feedback):
         margin=dict(t=40, b=0, l=0, r=0),
         annotations=[
             # Annotations for Chart 1 (top)
-            dict(text=f'{correct_perc}%', x=0.5, y=0.84, font=dict(size=30, color='#f1f5f9'), showarrow=False),
-            dict(text='Correct', x=0.5, y=0.74, font=dict(size=14, color='#94a3b8'), showarrow=False),
+            dict(text=f'{correct_perc}%', x=0.5, y=0.80, font=dict(size=30, color='#f1f5f9'), showarrow=False),
+            dict(text='Correct', x=0.5, y=0.70, font=dict(size=14, color='#94a3b8'), showarrow=False),
             # Annotations for Chart 2 (bottom)
-            dict(text=f'{incorrect_perc}%', x=0.5, y=0.18, font=dict(size=30, color='#f1f5f9'), showarrow=False),
-            dict(text='Incorrect', x=0.5, y=0.32, font=dict(size=14, color='#94a3b8'), showarrow=False),
+            dict(text=f'{incorrect_perc}%', x=0.5, y=0.30, font=dict(size=30, color='#f1f5f9'), showarrow=False),
+            dict(text='Incorrect', x=0.5, y=0.20, font=dict(size=14, color='#94a3b8'), showarrow=False),
             # Main Title
             dict(text='', x=0.5, y=1, font_size=20, font_color="#f1f5f9", showarrow=False)
         ]
