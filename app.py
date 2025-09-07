@@ -4,9 +4,7 @@ import time
 from dotenv import load_dotenv
 from prompts import get_interview_prompt
 from utils.report import generate_report
-# Updated imports to reflect utils directory structure
-from utils.donut_chart import create_donut_chart
-from utils.bar_chart import create_bar_chart
+from utils.charts import create_donut_chart, create_bar_chart
 
 # =========================
 # Load environment variables
@@ -267,10 +265,6 @@ else:
 
         with col2:
             st.markdown("<h5>Question Breakdown</h5>", unsafe_allow_html=True)
-            
-            # Added debug line as requested
-            st.write(f"DEBUG: Feedback content is {st.session_state.feedback}") 
-
             bar_fig = create_bar_chart(st.session_state.feedback)
             st.plotly_chart(bar_fig, use_container_width=True)
         
@@ -294,4 +288,3 @@ else:
                 file_name="interview_report.pdf",
                 mime="application/octet-stream"
             )
-
