@@ -263,10 +263,6 @@ else:
             donut_fig = create_donut_chart(st.session_state.score, total_questions)
             st.plotly_chart(donut_fig, use_container_width=True)
 
-        with col2:
-            st.markdown("<h5>Question Breakdown</h5>", unsafe_allow_html=True)
-            bar_fig = create_bar_chart(st.session_state.feedback)
-            st.plotly_chart(bar_fig, use_container_width=True)
         
         st.write("---")
         st.subheader("💡 Detailed Feedback")
