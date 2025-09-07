@@ -61,7 +61,7 @@ def create_donut_chart(score, total_questions):
     return fig
 
 
-def create_question_breakdown_charts(feedback):
+def create_bar_chart(feedback):
     """
     Creates two separate donut charts for the question breakdown, showing correct and incorrect percentages.
     This function fixes the original issue where charts would render incorrect colors when a value was zero.
@@ -131,3 +131,4 @@ def create_question_breakdown_charts(feedback):
         ]
     )
     return fig
+
