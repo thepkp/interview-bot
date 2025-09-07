@@ -9,42 +9,32 @@ def create_donut_chart(score, total_questions):
 
     labels = ['Correct', 'Incorrect']
     values = [correct_answers, incorrect_answers]
-    # Softer neutral green + red instead of harsh blue
-    colors = ['#22c55e', '#ef4444']
+    colors = ['#14b8a6', '#f43f5e']
 
     fig = go.Figure(data=[go.Pie(
         labels=labels,
         values=values,
-        hole=.55,  # cleaner ring look
-        marker=dict(colors=colors, line=dict(color='#0f172a', width=2)),  # dark border for slices
+        hole=.6,  # cleaner ring look
+        marker=dict(
+            colors=colors,
+        ),
         hoverinfo='label+percent',
-        textinfo='percent',  # cleaner than raw values
+        textinfo='percent',
         textfont=dict(size=18, color="#f1f5f9", family="Segoe UI, sans-serif"),
+        pull=[0.03, 0.03]
     )])
 
     fig.update_layout(
-        showlegend=True,
-        legend=dict(
-            orientation="h",
-            yanchor="bottom",
-            y=-0.25,  # slightly more spacing
-            xanchor="center",
-            x=0.5,
-            font=dict(color="#f1f5f9", size=12)
-        ),
+        showlegend=False,
         paper_bgcolor='#1e293b',
         plot_bgcolor='#1e293b',
         font_color='#f1f5f9',
         margin=dict(t=30, b=20, l=20, r=20),
-        height=320
-    )
-
-    # Add score annotation in center
-    fig.add_annotation(
-        text=f"{correct_answers}/{total_questions}",
-        x=0.5, y=0.5,
-        font=dict(size=20, color="#f1f5f9", family="Segoe UI, sans-serif"),
-        showarrow=False
+        height=320,
+        annotations=[
+            dict(text='Score', x=0.5, y=0.55, font_size=16, showarrow=False, font=dict(color="#94a3b8")),
+            dict(text=f"{correct_answers}/{total_questions}", x=0.5, y=0.45, font_size=24, showarrow=False, font=dict(family="Segoe UI, sans-serif"))
+        ]
     )
 
     return fig
@@ -56,26 +46,34 @@ def create_bar_chart(feedback):
     """
     scores = [1 if 'Correct' in fb else 0 for fb in feedback]
     question_labels = [f"Q{i+1}" for i in range(len(scores))]
-    colors = ['#3b82f6' if s == 1 else '#ef4444' for s in scores]
+    colors = ['#14b8a6' if s == 1 else '#f43f5e' for s in scores]
 
     fig = go.Figure(data=[go.Bar(
         x=question_labels,
-        y=scores,
-        marker_color=colors,
+        y=[1] * len(scores),
+        marker=dict(
+            color=colors,
+            cornerradius=5
+        ),
         text=['Correct' if s == 1 else 'Incorrect' for s in scores],
-        textposition='auto',
+        textposition='inside',
+        textfont=dict(size=14, color="#f1f5f9", family="Segoe UI, sans-serif"),
+        hoverinfo='text'
     )])
 
     fig.update_layout(
         xaxis_title="Questions",
         yaxis=dict(
             showticklabels=False,
-            range=[0, 1.2]
+            showgrid=False,
+            zeroline=False,
+            visible=False
         ),
         paper_bgcolor='#1e293b',
         plot_bgcolor='#1e293b',
         font_color='#f1f5f9',
         margin=dict(t=20, b=20, l=20, r=20),
-        height=300
+        height=300,
+        bargap=0.3
     )
     return fig
