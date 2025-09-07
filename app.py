@@ -96,29 +96,36 @@ if "score" not in st.session_state:
 # =========================
 st.sidebar.title("⚙️ Setup Interview")
 
-# --- UPDATED: Changed the selectbox options ---
+# --- NEW: Add a toggle for AI-generated questions ---
+use_ai = st.sidebar.toggle("🤖 Use AI-Generated Questions", help="Generates unique questions using AI. Requires a Google AI API key.")
+
 custom_set = st.sidebar.selectbox(
     "Custom Question Set",
-    ["Standard", "FAANG / MAANG"]
+    ["Standard", "FAANG / MAANG"],
+    disabled=use_ai # Disable if AI is generating questions based on role/mode
 )
 
-# --- UPDATED: Changed the condition to check for "Standard" ---
 if custom_set == "Standard":
     role = st.sidebar.selectbox("Role", ["Software Engineer", "Product Manager", "Data Analyst"])
     mode = st.sidebar.radio("Mode", ["Technical", "Behavioral"])
 else:
-    # Disable role and mode if a custom set is chosen, as it has its own questions
     st.sidebar.markdown("---")
     st.sidebar.info(f"Using the **{custom_set}** question set.")
-    role = "Software Engineer" # Default values, not used for question selection
-    mode = "Technical" # Default values, not used for question selection
+    role = "Software Engineer"
+    mode = "Technical"
 
 
 num_qs = st.sidebar.slider("Number of Questions", 3, 10, 3)
 
 if st.sidebar.button("🚀 Start Interview"):
-    # Pass the custom_set to the prompt generator
-    st.session_state.questions = get_interview_prompt(role, mode, num_qs, custom_set)
+    # Show a spinner while questions are being generated
+    spinner_text = "🤖 Generating unique questions..." if use_ai else "Preparing your interview..."
+    with st.spinner(spinner_text):
+        questions, error_message = get_interview_prompt(role, mode, num_qs, custom_set, use_ai)
+        if error_message:
+            st.error(error_message)
+        st.session_state.questions = questions
+
     st.session_state.answers = []
     st.session_state.feedback = []
     st.session_state.step = 0
@@ -157,7 +164,7 @@ else:
         q = st.session_state.questions[step]
         st.markdown(f"<div class='card'><b>Q{step+1}: {q['q']}</b></div>", unsafe_allow_html=True)
 
-        choice = st.radio("Choose your answer:", q["options"], index=None, key=f"mcq_{step}")
+        choice = st.radio("Choose your answer:", q.get("options", []), index=None, key=f"mcq_{step}")
 
         col1, col2 = st.columns([1, 0.1])
         if col1.button("Submit", key=f"submit_{step}"):
