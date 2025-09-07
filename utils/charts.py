@@ -4,6 +4,7 @@ from plotly.subplots import make_subplots
 def create_donut_chart(score, total_questions):
     """
     Creates a donut chart visualizing the percentage of correct vs incorrect answers.
+    This is the overall performance chart.
     """
     correct_answers = score
     incorrect_answers = total_questions - score
@@ -60,46 +61,60 @@ def create_donut_chart(score, total_questions):
     return fig
 
 
-def create_bar_chart(feedback):
+def create_question_breakdown_charts(feedback):
     """
-    Creates a bar chart showing the performance for each question.
+    Creates two separate donut charts for the question breakdown, showing correct and incorrect percentages.
+    This function fixes the original issue where charts would render incorrect colors when a value was zero.
     """
     total_questions = len(feedback)
+
+    # Handle the case where there is no feedback data yet
+    if total_questions == 0:
+        fig = make_subplots(rows=2, cols=1, specs=[[{'type':'domain'}], [{'type':'domain'}]])
+        fig.add_trace(go.Pie(values=[1], marker=dict(colors=['#37474F']), hole=.8, textinfo='none', hoverinfo='none'), 1, 1)
+        fig.add_trace(go.Pie(values=[1], marker=dict(colors=['#37474F']), hole=.8, textinfo='none', hoverinfo='none'), 2, 1)
+        fig.update_layout(
+            showlegend=False, paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', height=400,
+            margin=dict(t=40, b=40, l=10, r=10),
+            annotations=[
+                dict(text='0%', x=0.5, y=0.8, font=dict(size=30, color='#f1f5f9'), showarrow=False),
+                dict(text='Correct', x=0.5, y=0.7, font=dict(size=14, color='#94a3b8'), showarrow=False),
+                dict(text='0%', x=0.5, y=0.3, font=dict(size=30, color='#f1f5f9'), showarrow=False),
+                dict(text='Incorrect', x=0.5, y=0.2, font=dict(size=14, color='#94a3b8'), showarrow=False),
+            ]
+        )
+        return fig
+
     correct_answers = sum(1 for fb in feedback if 'Correct' in fb)
     incorrect_answers = total_questions - correct_answers
 
-    # Percentages are now only for the text display, not the chart values
-    if total_questions == 0:
-        correct_perc = 0
-        incorrect_perc = 0
-    else:
-        correct_perc = round((correct_answers / total_questions) * 100)
-        incorrect_perc = 100 - correct_perc
+    correct_perc = round((correct_answers / total_questions) * 100)
+    incorrect_perc = round((incorrect_answers / total_questions) * 100)
 
     fig = make_subplots(rows=2, cols=1, specs=[[{'type':'domain'}], [{'type':'domain'}]])
 
     # Chart 1: Correct Answers
+    # We explicitly handle the case where correct_answers is 0 to prevent coloring issues.
+    if correct_answers == 0:
+        c_values, c_colors = [1], ['#37474F'] # Show a full grey circle
+    else:
+        c_values, c_colors = [correct_answers, incorrect_answers], ['#8BC34A', '#37474F']
+
     fig.add_trace(go.Pie(
-        # FIX: Use the raw counts. Plotly will calculate percentages automatically.
-        values=[correct_answers, incorrect_answers],
-        labels=['Correct', 'Incorrect'],
-        hole=.8,
-        marker=dict(colors=['#8BC34A', '#37474F']),
-        textinfo='none',
-        hoverinfo='none',
-        sort=False
+        values=c_values, labels=['Correct', 'Other'], hole=.8,
+        marker=dict(colors=c_colors), textinfo='none', hoverinfo='none', sort=False
     ), 1, 1)
 
     # Chart 2: Incorrect Answers
+    # We do the same for the incorrect answers chart.
+    if incorrect_answers == 0:
+        i_values, i_colors = [1], ['#37474F'] # Show a full grey circle
+    else:
+        i_values, i_colors = [incorrect_answers, correct_answers], ['#F44336', '#37474F']
+
     fig.add_trace(go.Pie(
-        # FIX: Use the raw counts, with 'incorrect' as the primary value.
-        values=[incorrect_answers, correct_answers],
-        labels=['Incorrect', 'Correct'],
-        hole=.8,
-        marker=dict(colors=['#F44336', '#37474F']),
-        textinfo='none',
-        hoverinfo='none',
-        sort=False
+        values=i_values, labels=['Incorrect', 'Other'], hole=.8,
+        marker=dict(colors=i_colors), textinfo='none', hoverinfo='none', sort=False
     ), 2, 1)
 
     fig.update_layout(
@@ -109,11 +124,10 @@ def create_bar_chart(feedback):
         height=400,
         margin=dict(t=40, b=40, l=10, r=10),
         annotations=[
-            # Annotations use the calculated percentages for display
-            dict(text=f'{correct_perc}%', x=0.5, y=0.88, font=dict(size=30, color='#f1f5f9'), showarrow=False),
-            dict(text='Correct', x=0.5, y=0.80, font=dict(size=14, color='#94a3b8'), showarrow=False),
-            dict(text=f'{incorrect_perc}%', x=0.5, y=0.18, font=dict(size=30, color='#f1f5f9'), showarrow=False),
-            dict(text='Incorrect', x=0.5, y=0.15, font=dict(size=14, color='#94a3b8'), showarrow=False),
+            dict(text=f'{correct_perc}%', x=0.5, y=0.8, font=dict(size=30, color='#f1f5f9'), showarrow=False),
+            dict(text='Correct', x=0.5, y=0.7, font=dict(size=14, color='#94a3b8'), showarrow=False),
+            dict(text=f'{incorrect_perc}%', x=0.5, y=0.2, font=dict(size=30, color='#f1f5f9'), showarrow=False),
+            dict(text='Incorrect', x=0.5, y=0.3, font=dict(size=14, color='#94a3b8'), showarrow=False),
         ]
     )
     return fig
