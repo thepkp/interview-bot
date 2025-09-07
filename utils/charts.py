@@ -41,9 +41,7 @@ def create_donut_chart(score, total_questions):
         hoverinfo='label+percent',
         textinfo='none',
         direction='clockwise',
-        sort=False,
-        # Animation on hover - pop out effect
-        pull=[0.2, 0.2, 0.0] # Initial pull is 0, will change on hover
+        sort=False
     )])
 
     fig.update_layout(
@@ -57,7 +55,8 @@ def create_donut_chart(score, total_questions):
             dict(text=f"{correct_answers}/{total_questions}", x=0.5, y=0.5,
                  font=dict(size=40, color="#f1f5f9", family="Arial, sans-serif"),
                  showarrow=False)
-        ],
+        ]
+    )
     return fig
 
 
