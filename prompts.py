@@ -1,12 +1,22 @@
 import random
 
-def get_interview_prompt(role, mode, num_qs):
+def get_interview_prompt(role, mode, num_qs, custom_set="None"):
     """
-    Generates a list of interview questions based on role, mode, and number.
-    It shuffles and selects a random sample of questions from the database.
+    Generates a list of interview questions.
+    If a custom_set is provided, it uses that. Otherwise, it uses role and mode.
     """
-    # Expanded questions database for better shuffling
     questions_db = {
+        # --- NEW: A section for custom, curated question sets ---
+        "Custom Sets": {
+            "FAANG / MAANG": [
+                {"q": "Given an array of integers, find the two numbers that add up to a specific target.", "options": ["Brute-force (O(n^2))", "Hash Map (O(n))", "Sort and two-pointers (O(n log n))", "All of the above are possible solutions"], "answer": "All of the above are possible solutions"},
+                {"q": "How would you design a URL shortening service like TinyURL?", "options": ["Using a hash function", "Using a simple counter", "Using a combination of a counter and base62 encoding", "Using a random string generator"], "answer": "Using a combination of a counter and base62 encoding"},
+                {"q": "What is the difference between a process and a thread?", "options": ["Threads share memory space, processes don't", "Processes are lighter than threads", "A process can have only one thread", "They are the same"], "answer": "Threads share memory space, processes don't"},
+                {"q": "Explain the concept of database indexing.", "options": ["A way to make databases slower but more accurate", "A data structure that improves the speed of data retrieval", "A method for encrypting data", "A way to backup a database"], "answer": "A data structure that improves the speed of data retrieval"},
+                {"q": "Describe the CAP theorem in distributed systems.", "options": ["Consistency, Availability, Partition tolerance", "Correctness, Accuracy, Performance", "CPU, Algorithm, Power", "Client, Application, Protocol"], "answer": "Consistency, Availability, Partition tolerance"},
+                {"q": "What is Dynamic Programming and when would you use it?", "options": ["For sorting arrays", "For problems with optimal substructure and overlapping subproblems", "For designing user interfaces", "For sending network requests"], "answer": "For problems with optimal substructure and overlapping subproblems"},
+            ]
+        },
         "Software Engineer": {
             "Technical": [
                 {"q": "What is the difference between a list and a tuple in Python?", "options": ["Lists are mutable, tuples are not", "Tuples are mutable, lists are not", "They are the same", "Lists can only store integers"], "answer": "Lists are mutable, tuples are not"},
@@ -43,11 +53,14 @@ def get_interview_prompt(role, mode, num_qs):
         }
     }
 
-    selected_questions_pool = questions_db.get(role, {}).get(mode, [])
-    
+    # --- UPDATED LOGIC: Prioritize custom set over role/mode ---
+    if custom_set != "None (select role below)":
+        selected_questions_pool = questions_db.get("Custom Sets", {}).get(custom_set, [])
+    else:
+        selected_questions_pool = questions_db.get(role, {}).get(mode, [])
+
     # If the pool is smaller than the number of questions requested, just return the whole pool
     if len(selected_questions_pool) < num_qs:
-        # We shuffle the pool anyway so the order is random
         random.shuffle(selected_questions_pool)
         return selected_questions_pool
 
