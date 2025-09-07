@@ -4,11 +4,13 @@ from dotenv import load_dotenv
 from prompts import get_interview_prompt
 from utils.report import generate_report
 from utils.charts import create_donut_chart, create_bar_chart
+from utils.firestore_utils import init_firestore, save_score, get_leaderboard
 
 # =========================
-# Load environment variables
+# Load environment variables & Initialize DB
 # =========================
 load_dotenv()
+db = init_firestore()
 
 st.set_page_config(page_title="Interview Preparation Bot", layout="wide")
 
@@ -70,7 +72,7 @@ h1, h2, h3 {
     text-align: center;
 }
 .card span {
-     display: block;
+    display: block;
     text-align: center;
     color: var(--muted);
 }
@@ -90,47 +92,67 @@ if "step" not in st.session_state:
     st.session_state.step = 0
 if "score" not in st.session_state:
     st.session_state.score = 0
+if "user_name" not in st.session_state:
+    st.session_state.user_name = ""
+if "user_email" not in st.session_state:
+    st.session_state.user_email = ""
+
 
 # =========================
 # Sidebar Settings
 # =========================
 st.sidebar.title("⚙️ Setup Interview")
 
-# --- NEW: Add a toggle for AI-generated questions ---
+# --- User Details ---
+st.sidebar.subheader("Your Details")
+st.session_state.user_name = st.sidebar.text_input("Name", st.session_state.get('user_name', ''))
+st.session_state.user_email = st.sidebar.text_input("Email", st.session_state.get('user_email', ''))
+
+
+st.sidebar.divider()
+st.sidebar.subheader("Interview Settings")
+
+# --- AI Toggle ---
 use_ai = st.sidebar.toggle("🤖 Use AI-Generated Questions", help="Generates unique questions using AI. Requires a Google AI API key.")
 
 custom_set = st.sidebar.selectbox(
     "Custom Question Set",
     ["Standard", "FAANG / MAANG"],
-    disabled=use_ai # Disable if AI is generating questions based on role/mode
+    disabled=use_ai
 )
 
 if custom_set == "Standard":
     role = st.sidebar.selectbox("Role", ["Software Engineer", "Product Manager", "Data Analyst"])
     mode = st.sidebar.radio("Mode", ["Technical", "Behavioral"])
 else:
-    st.sidebar.markdown("---")
     st.sidebar.info(f"Using the **{custom_set}** question set.")
     role = "Software Engineer"
     mode = "Technical"
 
-
 num_qs = st.sidebar.slider("Number of Questions", 3, 10, 3)
 
 if st.sidebar.button("🚀 Start Interview"):
-    # Show a spinner while questions are being generated
-    spinner_text = "🤖 Generating unique questions..." if use_ai else "Preparing your interview..."
-    with st.spinner(spinner_text):
-        questions, error_message = get_interview_prompt(role, mode, num_qs, custom_set, use_ai)
-        if error_message:
-            st.error(error_message)
-        st.session_state.questions = questions
+    if not st.session_state.user_name or not st.session_state.user_email:
+        st.sidebar.error("Please enter your name and email to start.")
+    else:
+        spinner_text = "🤖 Generating unique questions..." if use_ai else "Preparing your interview..."
+        with st.spinner(spinner_text):
+            questions, error_message = get_interview_prompt(role, mode, num_qs, custom_set, use_ai)
+            
+            # --- THIS IS THE FIX ---
+            # Only proceed if questions were successfully generated
+            if not error_message and questions:
+                st.session_state.questions = questions
+                st.session_state.answers = []
+                st.session_state.feedback = []
+                st.session_state.step = 0
+                st.session_state.score = 0
+                st.rerun()
+            else:
+                # Show error if something went wrong
+                st.error(error_message or "Failed to load questions. Please try again.")
+                st.session_state.questions = []
 
-    st.session_state.answers = []
-    st.session_state.feedback = []
-    st.session_state.step = 0
-    st.session_state.score = 0
-    st.rerun()
 
 # =========================
 # Main UI (Landing + Interview Flow)
@@ -146,7 +168,7 @@ st.markdown(
 )
 
 if not st.session_state.questions:
-    # Landing Page with Feature Cards
+    # Landing Page with Feature Cards and Leaderboard
     st.info("Configure your interview settings in the sidebar and click **Start Interview** when ready.")
 
     col1, col2, col3 = st.columns(3)
@@ -155,7 +177,19 @@ if not st.session_state.questions:
     with col2:
         st.markdown("<div class='card'><div class='card-icon'>🤖</div><b>AI-Powered Feedback</b><span>Get detailed scoring and suggestions.</span></div>", unsafe_allow_html=True)
     with col3:
-        st.markdown("<div class='card'><div class='card-icon'>📊</div><b>Progress Tracking</b><span>Track your growth with reports.</span></div>", unsafe_allow_html=True)
+        st.markdown("<div class='card'><div class='card-icon'>📈</div><b>Leaderboard</b><span>See how you stack up against others.</span></div>", unsafe_allow_html=True)
+    
+    st.divider()
+
+    # --- Leaderboard Section ---
+    st.subheader("🏆 Leaderboard")
+    if db:
+        leaderboard_role = st.selectbox("Filter by Role:", ["All", "Software Engineer", "Product Manager", "Data Analyst"])
+        leaderboard_df = get_leaderboard(db, leaderboard_role)
+        if not leaderboard_df.empty:
+            st.dataframe(leaderboard_df, use_container_width=True, hide_index=True)
+        else:
+            st.write("No scores yet for this role. Be the first!")
 
 else:
     # === Interview Flow ===
@@ -189,8 +223,13 @@ else:
     else:
         # === Summary Report ===
         st.success("✅ Interview Complete!")
-        st.subheader("📊 Summary Report")
+        
+        # Save score to leaderboard
+        if db:
+            save_score(db, st.session_state.user_name, st.session_state.user_email, st.session_state.score, len(st.session_state.questions), role)
 
+        st.subheader("📊 Summary Report")
+        
         # --- Visualizations ---
         col1, col2 = st.columns(2)
         with col1:
@@ -213,7 +252,6 @@ else:
                 st.write(f"📝 **Your Answer:** {ans}")
                 st.write(f"💬 **Feedback:** {fb}")
 
-
         if st.button("Download PDF Report"):
             pdf_path = generate_report(
                 [q['q'] for q in st.session_state.questions],
@@ -222,3 +260,4 @@ else:
             )
             with open(pdf_path, "rb") as pdf_file:
                 st.download_button("📥 Download Report", data=pdf_file, file_name="interview_report.pdf")
+
