@@ -9,19 +9,36 @@ def create_donut_chart(score, total_questions):
 
     labels = ['Correct', 'Incorrect']
     values = [correct_answers, incorrect_answers]
-    colors = ['#14b8a6', '#f43f5e']
+    
+    # Using a theme-appropriate, vibrant color palette
+    colors = ['#14b8a6', '#f43f5e'] # Teal for correct, Rose for incorrect
+    
+    # Logic to handle cases where there are 0 correct or 0 incorrect answers
+    if correct_answers == 0:
+        plot_values = [incorrect_answers]
+        plot_labels = ['Incorrect']
+        segment_colors = [colors[1]]
+    elif incorrect_answers == 0:
+        plot_values = [correct_answers]
+        plot_labels = ['Correct']
+        segment_colors = [colors[0]]
+    else:
+        plot_values = values
+        plot_labels = labels
+        segment_colors = colors
 
     fig = go.Figure(data=[go.Pie(
-        labels=labels,
-        values=values,
-        hole=.6,  # cleaner ring look
+        labels=plot_labels,
+        values=plot_values,
+        hole=.7,
         marker=dict(
-            colors=colors,
+            colors=segment_colors,
         ),
         hoverinfo='label+percent',
         textinfo='percent',
-        textfont=dict(size=18, color="#f1f5f9", family="Segoe UI, sans-serif"),
-        pull=[0.03, 0.03]
+        textfont=dict(size=22, color="#f1f5f9", family="Arial, sans-serif"),
+        direction='clockwise',
+        sort=False,
     )])
 
     fig.update_layout(
@@ -29,11 +46,12 @@ def create_donut_chart(score, total_questions):
         paper_bgcolor='#1e293b',
         plot_bgcolor='#1e293b',
         font_color='#f1f5f9',
-        margin=dict(t=30, b=20, l=20, r=20),
-        height=320,
+        margin=dict(t=30, b=30, l=30, r=30),
+        height=350,
         annotations=[
-            dict(text='Score', x=0.5, y=0.55, font_size=16, showarrow=False, font=dict(color="#94a3b8")),
-            dict(text=f"{correct_answers}/{total_questions}", x=0.5, y=0.45, font_size=24, showarrow=False, font=dict(family="Segoe UI, sans-serif"))
+            dict(text=f"{correct_answers}/{total_questions}", x=0.5, y=0.5,
+                 font=dict(size=36, color="#f1f5f9", family="Arial, sans-serif"),
+                 showarrow=False)
         ]
     )
 
@@ -44,36 +62,45 @@ def create_bar_chart(feedback):
     """
     Creates a bar chart showing the performance for each question.
     """
-    scores = [1 if 'Correct' in fb else 0 for fb in feedback]
-    question_labels = [f"Q{i+1}" for i in range(len(scores))]
-    colors = ['#14b8a6' if s == 1 else '#f43f5e' for s in scores]
+    correct_answers = sum(1 for fb in feedback if 'Correct' in fb)
+    incorrect_answers = len(feedback) - correct_answers
+
+    labels = ['Incorrect', 'Correct']
+    values = [incorrect_answers, correct_answers]
+    colors = ['#f43f5e', '#14b8a6']
 
     fig = go.Figure(data=[go.Bar(
-        x=question_labels,
-        y=[1] * len(scores),
+        x=labels,
+        y=values,
+        text=values,
+        textposition='inside',
+        textfont=dict(size=18, color="#f1f5f9", family="Arial, sans-serif"),
         marker=dict(
             color=colors,
-            cornerradius=5
+            cornerradius=8
         ),
-        text=['Correct' if s == 1 else 'Incorrect' for s in scores],
-        textposition='inside',
-        textfont=dict(size=14, color="#f1f5f9", family="Segoe UI, sans-serif"),
-        hoverinfo='text'
+        width=[0.5, 0.5] # Set custom bar width
     )])
 
     fig.update_layout(
-        xaxis_title="Questions",
+        xaxis=dict(
+            showgrid=False,
+            zeroline=False,
+            showticklabels=True,
+            linecolor='rgba(0,0,0,0)',
+            tickfont=dict(size=14)
+        ),
         yaxis=dict(
             showticklabels=False,
             showgrid=False,
             zeroline=False,
-            visible=False
+            visible=False 
         ),
         paper_bgcolor='#1e293b',
         plot_bgcolor='#1e293b',
         font_color='#f1f5f9',
         margin=dict(t=20, b=20, l=20, r=20),
         height=300,
-        bargap=0.3
+        bargap=0.4
     )
     return fig
