@@ -1,7 +1,7 @@
 streamlit
 groq
 openai
+matplotlib
 python-dotenv
 reportlab
 pandas
-matplotlib
