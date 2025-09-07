@@ -9,27 +9,44 @@ def create_donut_chart(score, total_questions):
 
     labels = ['Correct', 'Incorrect']
     values = [correct_answers, incorrect_answers]
-    colors = ['#3b82f6', '#ef4444']
+    # Softer neutral green + red instead of harsh blue
+    colors = ['#22c55e', '#ef4444']
 
     fig = go.Figure(data=[go.Pie(
         labels=labels,
         values=values,
-        hole=.55,
-        marker_colors=colors,
+        hole=.55,  # cleaner ring look
+        marker=dict(colors=colors, line=dict(color='#0f172a', width=2)),  # dark border for slices
         hoverinfo='label+percent',
-        textinfo='value',
-        textfont_size=16,
+        textinfo='percent',  # cleaner than raw values
+        textfont=dict(size=18, color="#f1f5f9", family="Segoe UI, sans-serif"),
     )])
 
     fig.update_layout(
         showlegend=True,
-        legend=dict(orientation="h", yanchor="bottom", y=-0.2, xanchor="center", x=0.5),
+        legend=dict(
+            orientation="h",
+            yanchor="bottom",
+            y=-0.25,  # slightly more spacing
+            xanchor="center",
+            x=0.5,
+            font=dict(color="#f1f5f9", size=12)
+        ),
         paper_bgcolor='#1e293b',
         plot_bgcolor='#1e293b',
         font_color='#f1f5f9',
-        margin=dict(t=20, b=20, l=20, r=20),
-        height=300
+        margin=dict(t=30, b=20, l=20, r=20),
+        height=320
     )
+
+    # Add score annotation in center
+    fig.add_annotation(
+        text=f"{correct_answers}/{total_questions}",
+        x=0.5, y=0.5,
+        font=dict(size=20, color="#f1f5f9", family="Segoe UI, sans-serif"),
+        showarrow=False
+    )
+
     return fig
 
 
