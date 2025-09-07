@@ -62,59 +62,42 @@ def create_donut_chart(score, total_questions):
 
 def create_bar_chart(feedback):
     """
-    Creates a bar chart showing the performance for each question.
+    Creates a horizontal bar chart showing the count of correct and incorrect answers.
     """
-    total_questions = len(feedback)
-    score = sum(1 for fb in feedback if 'Correct' in fb)
-    incorrect_answers = total_questions - score
+    correct_answers = sum(1 for fb in feedback if '✅ Correct' in fb)
+    incorrect_answers = len(feedback) - correct_answers
+    
+    # Define labels and values for the chart
+    labels = ['Incorrect', 'Correct']
+    values = [incorrect_answers, correct_answers]
+    colors = ['#F44336', '#8BC34A'] # Red for incorrect, Green for correct
 
-    if total_questions == 0:
-        correct_perc = 0
-        incorrect_perc = 0
-    else:
-        correct_perc = round((score / total_questions) * 100)
-        incorrect_perc = round((incorrect_answers / total_questions) * 100)
-        # Ensure percentages sum to 100 in case of rounding
-        if correct_perc + incorrect_perc != 100:
-            incorrect_perc = 100 - correct_perc
+    fig = go.Figure()
 
-    fig = make_subplots(rows=2, cols=1, specs=[[{'type':'domain'}], [{'type':'domain'}]])
-
-    # Chart 1: Correct Answers
-    fig.add_trace(go.Pie(
-        values=[correct_perc, incorrect_perc], # FIX: Use explicit correct and incorrect percentages
-        hole=.8,
-        marker=dict(colors=['#8BC34A', '#37474F']),
-        textinfo='none',
-        hoverinfo='none',
-        sort=False
-    ), 1, 1)
-
-    # Chart 2: Incorrect Answers
-    fig.add_trace(go.Pie(
-        values=[incorrect_perc, correct_perc], # FIX: Use explicit incorrect and correct percentages
-        hole=.8,
-        marker=dict(colors=['#F44336', '#37474F']),
-        textinfo='none',
-        hoverinfo='none',
-        sort=False
-    ), 2, 1)
+    fig.add_trace(go.Bar(
+        y=labels,
+        x=values,
+        orientation='h', # Make the bar chart horizontal
+        marker=dict(
+            color=colors,
+            line=dict(color='#1e293b', width=1)
+        ),
+        text=values,
+        textposition='outside', # Show the count outside the bar
+        textfont=dict(color='#f1f5f9', size=16)
+    ))
 
     fig.update_layout(
         showlegend=False,
         paper_bgcolor='rgba(0,0,0,0)',
         plot_bgcolor='rgba(0,0,0,0)',
+        font_color='#f1f5f9',
+        margin=dict(t=40, b=40, l=20, r=20),
         height=400,
-        margin=dict(t=40, b=0, l=0, r=0),
-        annotations=[
-            # Annotations for Chart 1 (top) - Re-centered
-            dict(text=f'{correct_perc}%', x=0.5, y=0.88, font=dict(size=30, color='#f1f5f9'), showarrow=False),
-            dict(text='Correct', x=0.5, y=0.80, font=dict(size=14, color='#94a3b8'), showarrow=False),
-            # Annotations for Chart 2 (bottom) - Re-centered
-            dict(text=f'{incorrect_perc}%', x=0.5, y=0.18, font=dict(size=30, color='#f1f5f9'), showarrow=False),
-            dict(text='Incorrect', x=0.5, y=0.15, font=dict(size=14, color='#94a3b8'), showarrow=False),
-            # Main Title
-            dict(text='', x=0.5, y=1, font_size=20, font_color="#f1f5f9", showarrow=False)
-        ]
+        xaxis=dict(showgrid=False, visible=False), # Hide x-axis labels and grid
+        yaxis=dict(showgrid=False, automargin=True), # Hide y-axis grid
+        title=dict(text='Question Breakdown', x=0.5) # Add a title to the chart
     )
+    
     return fig
+
