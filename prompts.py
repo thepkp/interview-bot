@@ -43,8 +43,6 @@ def get_interview_prompt(role, mode, num_qs):
         }
     }
 
-    # --- No changes needed to the logic below ---
-    
     selected_questions_pool = questions_db.get(role, {}).get(mode, [])
     
     # If the pool is smaller than the number of questions requested, just return the whole pool
@@ -55,28 +53,4 @@ def get_interview_prompt(role, mode, num_qs):
 
     # Use random.sample to pick a unique, shuffled set of questions
     return random.sample(selected_questions_pool, k=num_qs)
-```
-
-**What did I change?**
-
-1.  **Added More Questions:** I expanded the lists of questions for each role and mode. Now, when `random.sample(..., k=3)` is called on a list of 6 questions, it has many different combinations to choose from.
-2.  **Added a Safeguard:** I added a small check. If you ask for more questions than are available in the database, it will just return all the available questions in a random order, preventing an error.
-
-### Step 2: Commit and Push to GitHub
-
-No other files need to be changed. Now, just commit this update to your repository.
-
-1.  **Open a terminal or command prompt** in your project's root directory.
-2.  **Add the changed file** to the staging area.
-    ```bash
-    git add utils/prompts.py
-    ```
-3.  **Commit the change** with a clear message.
-    ```bash
-    git commit -m "feat: Expand question database for better shuffling"
-    ```
-4.  **Push the change** to GitHub.
-    ```bash
-    git push origin main
-    
 
